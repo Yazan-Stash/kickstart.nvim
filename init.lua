@@ -598,6 +598,28 @@ require('lazy').setup({
         -- ts_ls = {},
         --
 
+        tailwindcss = {},
+
+        yamlls = {},
+
+        intelephense = {
+          settings = {
+            intelephense = {
+              environment = {
+                phpVersion = '8.3.0',
+              },
+              format = {
+                enable = false
+              },
+              diagnostics = {
+                unusedSymbols = false,
+                languageConstraints = false
+              },
+              licenceKey = '00KFLKHTOPAQ2JL',
+            },
+          },
+        },
+
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -630,6 +652,8 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'php-cs-fixer', -- Used to format PHP code
+        'prettierd', -- Used to format JS, TS, JSON, CSS, HTML, etc.
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -682,11 +706,70 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        php = { 'php_cs_fixer' },
+        blade = { 'prettierd' },
+        javascript = { 'prettierd' },
+        javascriptreact = { 'prettierd' },
+        typescript = { 'prettierd' },
+        typescriptreact = { 'prettierd' },
+        vue = { 'prettierd' },
+        css = { 'prettierd' },
+        scss = { 'prettierd' },
+        less = { 'prettierd' },
+        html = { 'prettierd' },
+        json = { 'prettierd' },
+        jsonc = { 'prettierd' },
+        yaml = { 'prettierd' },
+        markdown = { 'prettierd' },
+        ['markdown.mdx'] = { 'prettierd' },
+        graphql = { 'prettierd' },
+        handlebars = { 'prettierd' },
+      },
+      formatters = {
+        php_cs_fixer = {
+          condition = function(self, ctx)
+            -- Only run if .php-cs-fixer.php or .php-cs-fixer.dist.php exists in project root
+            local root = vim.fs.root(ctx.buf, { '.php-cs-fixer.php', '.php-cs-fixer.dist.php', '.git' })
+            if not root then
+              return false
+            end
+            local config_files = { '.php-cs-fixer.php', '.php-cs-fixer.dist.php' }
+            for _, config in ipairs(config_files) do
+              if vim.fn.filereadable(root .. '/' .. config) == 1 then
+                return true
+              end
+            end
+            return false
+          end,
+        },
+        prettierd = {
+          condition = function(self, ctx)
+            -- Only run if .prettierrc or prettier config exists in project root
+            local root = vim.fs.root(ctx.buf, { '.prettierrc', '.prettierrc.json', '.prettierrc.js', 'prettier.config.js', '.git' })
+            if not root then
+              return false
+            end
+            local config_files = {
+              '.prettierrc',
+              '.prettierrc.json',
+              '.prettierrc.yml',
+              '.prettierrc.yaml',
+              '.prettierrc.json5',
+              '.prettierrc.js',
+              '.prettierrc.cjs',
+              '.prettierrc.mjs',
+              'prettier.config.js',
+              'prettier.config.cjs',
+              'prettier.config.mjs',
+            }
+            for _, config in ipairs(config_files) do
+              if vim.fn.filereadable(root .. '/' .. config) == 1 then
+                return true
+              end
+            end
+            return false
+          end,
+        },
       },
     },
   },
@@ -720,7 +803,18 @@ require('lazy').setup({
           --   end,
           -- },
         },
-        opts = {},
+        config = function()
+          local ls = require('luasnip')
+
+          -- Load custom snippets
+          ls.add_snippets('php', require('snippets.php'))
+          ls.add_snippets('vue', require('snippets.vue'))
+          ls.add_snippets('blade', require('snippets.blade'))
+
+          -- Also load snippets for javascript/typescript
+          ls.add_snippets('javascript', require('snippets.vue'))
+          ls.add_snippets('typescript', require('snippets.vue'))
+        end,
       },
       'folke/lazydev.nvim',
     },
@@ -808,7 +902,37 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+    --   vim.cmd.colorscheme 'nord'
+    --   vim.cmd.colorscheme 'ayu-light'
+    --   vim.cmd.colorscheme 'mirage'
+      vim.cmd.colorscheme 'material-deep-ocean'
+    end,
+  },
+
+  -- Additional colorschemes
+  {
+    'shaunsingh/nord.nvim',
+    lazy = true,
+  },
+
+  {
+    'Shatur/neovim-ayu',
+    lazy = true,
+  },
+
+  {
+    'marko-cerovac/material.nvim',
+    lazy = true,
+    config = function()
+      require('material').setup {
+        disable = {
+          colored_cursor = false,
+          borders = false,
+          background = false,
+          term_colors = false,
+          eob_lines = false,
+        },
+      }
     end,
   },
 
@@ -856,9 +980,30 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+    dependencies = {
+      {
+        'EmranMR/tree-sitter-blade',
+        config = function()
+          local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+          parser_config.blade = {
+            install_info = {
+              url = 'https://github.com/EmranMR/tree-sitter-blade',
+              files = { 'src/parser.c' },
+              branch = 'main',
+            },
+            filetype = 'blade',
+          }
+          vim.filetype.add {
+            pattern = {
+              ['.*%.blade%.php'] = 'blade',
+            },
+          }
+        end,
+      },
+    },
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'php', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'php', 'blade', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {

@@ -10,7 +10,10 @@
   "mason-lspconfig.nvim": { "branch": "main", "commit": "6bdb14f230de0904229ec367b410fb817e59b072" },
   "mason-tool-installer.nvim": { "branch": "main", "commit": "517ef5994ef9d6b738322664d5fdd948f0fdeb46" },
   "mason.nvim": { "branch": "main", "commit": "ad7146aa61dcaeb54fa900144d768f040090bff0" },
+  "material.nvim": { "branch": "main", "commit": "249289d9e75fa9ca054e6c6b98f56820e9719300" },
   "mini.nvim": { "branch": "main", "commit": "fbb6ad02871d296fc7d3ebd453e1be89b1210f68" },
+  "neovim-ayu": { "branch": "master", "commit": "cc78e880cce5dfc1187d144ed7251c746feff259" },
+  "nord.nvim": { "branch": "master", "commit": "80c1e5321505aeb22b7a9f23eb82f1e193c12470" },
   "nvim-lspconfig": { "branch": "master", "commit": "e688b486fe9291f151eae7e5c0b5a5c4ef980847" },
   "nvim-treesitter": { "branch": "master", "commit": "42fc28ba918343ebfd5565147a42a26580579482" },
   "nvim-web-devicons": { "branch": "master", "commit": "b8221e42cf7287c4dcde81f232f58d7b947c210d" },
@@ -20,5 +23,6 @@
   "telescope.nvim": { "branch": "master", "commit": "b4da76be54691e854d3e0e02c36b0245f945c2c7" },
   "todo-comments.nvim": { "branch": "main", "commit": "19d461ddd543e938eb22505fb03fa878800270b6" },
   "tokyonight.nvim": { "branch": "main", "commit": "00d92e6009671493fceeb0e4baf644f5b983e6e4" },
+  "tree-sitter-blade": { "branch": "main", "commit": "cc764dadcbbceb3f259396fef66f970c72e94f96" },
   "which-key.nvim": { "branch": "main", "commit": "b4177e3eaf15fe5eb8357ebac2286d488be1ed00" }
 }
