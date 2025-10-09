@@ -1,0 +1,7 @@
+- [ ] Snippets
+- [ ] Intelliphense
+- [ ] PHP-CS-Fixer or fallback to Pint or do nothing
+- [ ] Prettier
+- [ ] tailwind-lsp
+- [ ] Themes; Nord, Ayu, Material
+- [ ] Syntax highlighting for PHP and Blade
